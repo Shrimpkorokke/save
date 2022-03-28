@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class JK_Skills : MonoBehaviour
 {
@@ -14,10 +16,12 @@ public class JK_Skills : MonoBehaviour
     public Vector3 skillOneDir;
     public Vector3 skillOneDir_2;
 
+
     private void Awake()
     {
         instance = this;
         ani = GetComponent<Animator>();
+        // monsterList = new List<NavMeshAgent>();
 
     }
 
@@ -25,17 +29,13 @@ public class JK_Skills : MonoBehaviour
     {
         ShieldDash();
         Skill_1_1();
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            GatherEnemy();
-        }
-
     }
+
     void ShieldDash()
     {
         if (Input.GetKey(KeyCode.A))
         {
-            ani.Play("Skill_ShieldDash_1");    
+            ani.Play("Skill_ShieldDash_1");
         }
     }
     void Skill_1_1()
@@ -45,14 +45,14 @@ public class JK_Skills : MonoBehaviour
         {
             skillOneDir = this.transform.forward;
             // 만약 쉬프트가 눌리고 달리는 상태이며, dodge하는 중이 아니고, 쿨타임이 0이라면 
-            if (Input.GetKeyDown(KeyCode.S) && skillOneCoolTime <= 0 && !JK_Player.instance.isDodge && !isSkillOne &&!isSkillOne_2)
+            if (Input.GetKeyDown(KeyCode.S) && skillOneCoolTime <= 0 && !JK_Player.instance.isDodge && !isSkillOne && !isSkillOne_2)
             {
                 // dodgeSpeed 값을 addSpeed에 넣고, isDodge를 true로 하면서 애니메이션을 재생한다. 이 후, dodgeCoolTime에 회피 쿨타임을 넣어주고, dodgeTime에 회피(무적) 시간을 넣어준다. 
                 addSpeed = jumpSpeed;
                 ani.Play("Skill_1");
                 isSkillOne = true; ;
                 skillOneCoolTime = 5f;
-               
+
 
             }
         }
@@ -67,12 +67,11 @@ public class JK_Skills : MonoBehaviour
         {
             addSpeed = 0;
             isSkillOne = false;
-            
+
         }
 
     }
-    public int detectRadius = 5;
-    GameObject target;
+
     // Skill_1의 두번째 단계 앞으로 점프
     void Skill_1_2()
     {
@@ -96,16 +95,31 @@ public class JK_Skills : MonoBehaviour
             addSpeed = 0;
             isSkillOne_2 = false;
         }
-       
-    }
-    
-    // Skill_2의 첫번째 단계 기를 모으고 있는 도중 주변의 적을 빨아드린다 받는 피해를 70% 감소시키고 감소시킨 피해만큼 주변의 적에게 데미지를 입힘
-    void skill_2_1()
-    {
-        
+
     }
 
-    private void GatherEnemy()
+    void Roar()
+    {
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            ani.Play("Roar");
+        }
+    }
+
+
+    void ShakeGround()
+    {
+        JK_CameraMove.instance.OnShakeCamera(0.5f, 0.05f);
+    }
+   /* public int detectRadius = 5;
+    GameObject target;
+    public float gatheringSpeed = 2;
+
+    float damage;
+    float skillTwoCooltime = 0;
+    bool gatherEnemy = false;*/
+    // List<NavMeshAgent> monsterList;
+    /* private void GatherEnemy()
     {
         Collider[] obj = Physics.OverlapSphere(transform.position, detectRadius);
         for (int i = 0; i < obj.Length; i++)
@@ -113,14 +127,50 @@ public class JK_Skills : MonoBehaviour
             if (obj[i].tag.Contains("Monster"))
             {
                 target = obj[i].gameObject;
-                target.transform.position = transform.position;
+                *//*Vector3 dir = target.transform.position - transform.position;
+                Vector3 targetPosition = Vector3.ClampMagnitude(dir, 0.1f);*//*
+                Vector3 dir = transform.position - target.transform.position;
+                Vector3 targetPosition = Vector3.ClampMagnitude(dir, 70);
+                target.transform.position = Vector3.Lerp(target.transform.position, targetPosition, Time.deltaTime * 5);
+
             }
-
         }
+    }*/
 
-    }
-    void ShakeGround()
+    /*private void GatherEnemy2()
     {
-        JK_CameraMove.instance.OnShakeCamera(0.5f, 0.05f);
-    }
+        Collider[] obj = Physics.OverlapSphere(transform.position, detectRadius);
+        for (int i = 0; i < obj.Length; i++)
+        {
+            if (obj[i].tag.Contains("Monster"))
+            {
+                target = obj[i].gameObject;
+                // agent기능을 끄고싶다. 왜냐하면 agnet가 위치를 강제로 설정하기때문이다.
+                NavMeshAgent agent = target.GetComponent<NavMeshAgent>();
+                agent.isStopped = true;
+                agent.enabled = false;
+                // 목록안에 포함되지 않은 요원이라면 추가하고싶다.
+                if (false == monsterList.Contains(agent))
+                {
+                    monsterList.Add(agent);
+                }
+
+                Vector3 dir = target.transform.position - transform.position;
+                Vector3 targetPosition = Vector3.ClampMagnitude(dir, 5);
+
+                target.transform.position = Vector3.Lerp(target.transform.position, targetPosition, Time.deltaTime * 5);
+
+            }
+        }
+    }*/
+
+    /*void DisposeEnemy()
+    {
+        for (int i = 0; i < monsterList.Count; i++)
+        {
+            monsterList[i].isStopped = false;
+            monsterList[i].enabled = true;
+        }
+        monsterList.Clear();
+    }*/
 }

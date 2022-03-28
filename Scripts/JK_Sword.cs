@@ -41,7 +41,9 @@ public class JK_Sword : MonoBehaviour
                 HSK_MeleeEnemy01.SingleTonMeleeEnemy01.hp = HSK_MeleeEnemy01.SingleTonMeleeEnemy01.hp - damage;
                 other.GetComponent<HSK_MeleeEnemy01>().HpBarDown();
 
-                //히트스탑, 카메라 흔들림, 효과음재생, 히트 이펙트 재생
+                // 궁극기 게이지 증가, 히트스탑, 카메라 흔들림, 효과음재생, 히트 이펙트 재생
+                JK_Player.instance.ULTGAUGE = JK_Player.instance.ULTGAUGE + 1;
+                JK_ComboManager.instance.IncreaseCombo();
                 GameObject hitEffect = Instantiate(hitEffectFactory); //이펙트 재생
                 hitEffect.transform.position = other.transform.position + new Vector3(0, 1, 0); //이펙트 위치
                 JK_CameraMove.instance.OnShakeCamera(0.05f, 0.05f);

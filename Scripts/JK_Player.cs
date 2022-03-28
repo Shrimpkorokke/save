@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class JK_Player : MonoBehaviour
 {
@@ -22,8 +23,6 @@ public class JK_Player : MonoBehaviour
     public Vector3 dir;
     Vector3 dodgeDir;
     Vector3 deadDir;
-    
-   
 
     public GameObject hitBox;
     bool dodgeKeyDown;
@@ -39,6 +38,33 @@ public class JK_Player : MonoBehaviour
     Rigidbody rb;
 
     public int hp = 100;
+    public int maxHP = 1000;
+    public Slider playerHP;
+
+    public int ult;
+    public int maxUlt = 50;
+    public Slider ultGauge;
+    public Image fillImage;
+    
+    public int HP
+    {
+        get { return hp; }
+        set
+        {
+            hp = value;
+            playerHP.value = hp;
+        }
+    }
+
+    public int ULTGAUGE
+    {
+        get { return ult; }
+        set
+        {
+            ult = value;
+            ultGauge.value = ult;
+        }
+    }
     void Awake()
     {
         instance = this;
@@ -46,22 +72,27 @@ public class JK_Player : MonoBehaviour
         ani = GetComponentInChildren<Animator>();
         
     }
+    private void Start()
+    {
+        playerHP.maxValue = maxHP;
+        HP = maxHP;
 
-    
+        ultGauge.maxValue = maxUlt;
+        ULTGAUGE = 0;
+    }
 
-    
+
+
     void Update()
     {
-           
-        
+  
         GetInput();
         Run();
         Turn();
         Dodge();
         CoolTimeCal();
-
         Dead();
-        
+        FullUltGauge();
 
 
     }
@@ -112,7 +143,7 @@ public class JK_Player : MonoBehaviour
             dir = attackDir;
             speed = 0;
             rb.MovePosition(transform.position + attackDir * speed * Time.deltaTime);
-            speed = 30;
+            speed = 50;
         }
         // 방어 중일 경우 방향을 방어 직전의 방향으로 설정하고, 속도를 0으로 만든다. (못 움직이게)
         else if (Jk_Parrying.instance.isParrying == true)
@@ -150,7 +181,7 @@ public class JK_Player : MonoBehaviour
         }
         else if (!isDodge && !Jk_Parrying.instance.isParrying && this.tag != "Player_Dead" && !JK_Skills.instance.isSkillOne && !JK_Skills.instance.isSkillOne_2)
         {
-            speed = 30;
+            speed = 50;
         }
         // 움직임이 있을 경우 isRun을 true, 아닐 경우 false의 값을 넣어준다.
         if (dir != Vector3.zero)
@@ -261,9 +292,17 @@ public class JK_Player : MonoBehaviour
         
     }
 
+    void FullUltGauge()
+    {
+        if(ultGauge.value == maxUlt)
+        {
+            fillImage.color = new Color (160/255f, 245/255f, 255/255f);
+        }
+    }
     public void DamageAction(int damage)
     {
         //Enemy의 공격력만큼 플레이어의 체력을 깎는다.
         hp -= damage;
+        HP = hp;
     }
 }
