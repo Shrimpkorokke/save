@@ -45,7 +45,42 @@ public class JK_Player : MonoBehaviour
     public int maxUlt = 50;
     public Slider ultGauge;
     public Image fillImage;
+
     
+  
+    void Awake()
+    {
+        instance = this;
+        rb = GetComponent<Rigidbody>();
+        ani = GetComponentInChildren<Animator>();
+        
+    }
+    private void Start()
+    {
+
+        playerHP.maxValue = maxHP;
+        HP = maxHP;
+
+        ultGauge.maxValue = maxUlt;
+        ULTGAUGE = 0;
+
+    }
+
+
+
+    void Update()
+    {
+  
+        GetInput();
+        Run();
+        Turn();
+        Dodge();
+        CoolTimeCal();
+        Dead();
+        FullUltGauge();
+
+
+    }
     public int HP
     {
         get { return hp; }
@@ -65,38 +100,6 @@ public class JK_Player : MonoBehaviour
             ultGauge.value = ult;
         }
     }
-    void Awake()
-    {
-        instance = this;
-        rb = GetComponent<Rigidbody>();
-        ani = GetComponentInChildren<Animator>();
-        
-    }
-    private void Start()
-    {
-        playerHP.maxValue = maxHP;
-        HP = maxHP;
-
-        ultGauge.maxValue = maxUlt;
-        ULTGAUGE = 0;
-    }
-
-
-
-    void Update()
-    {
-  
-        GetInput();
-        Run();
-        Turn();
-        Dodge();
-        CoolTimeCal();
-        Dead();
-        FullUltGauge();
-
-
-    }
-    
     // Player의 이동에 관련된 함수
     void Run() 
     {
@@ -131,7 +134,7 @@ public class JK_Player : MonoBehaviour
         {
             dir = JK_Skills.instance.skillOneDir_2;
             rb.MovePosition(transform.position + JK_Skills.instance.skillOneDir * (JK_Skills.instance.addSpeed * JK_Skills.instance.jumpSpeed) * Time.deltaTime * 2.5f);
-            print(JK_Skills.instance.isSkillOne_2);
+            
 
         }
        
@@ -143,7 +146,7 @@ public class JK_Player : MonoBehaviour
             dir = attackDir;
             speed = 0;
             rb.MovePosition(transform.position + attackDir * speed * Time.deltaTime);
-            speed = 50;
+            speed = 30;
         }
         // 방어 중일 경우 방향을 방어 직전의 방향으로 설정하고, 속도를 0으로 만든다. (못 움직이게)
         else if (Jk_Parrying.instance.isParrying == true)
@@ -179,10 +182,11 @@ public class JK_Player : MonoBehaviour
             rb.MovePosition(transform.position + Vector3.zero * speed * Time.deltaTime);
             Vector3.forward;*/
         }
-        else if (!isDodge && !Jk_Parrying.instance.isParrying && this.tag != "Player_Dead" && !JK_Skills.instance.isSkillOne && !JK_Skills.instance.isSkillOne_2)
+        else if (!isDodge && !Jk_Parrying.instance.isParrying && this.tag != "Player_Dead" && !JK_Skills.instance.isSkillOne && !JK_Skills.instance.isSkillOne_2 && !this.CompareTag("Player_SDash"))
         {
-            speed = 50;
+            speed = 30;
         }
+        
         // 움직임이 있을 경우 isRun을 true, 아닐 경우 false의 값을 넣어준다.
         if (dir != Vector3.zero)
         {
@@ -231,17 +235,15 @@ public class JK_Player : MonoBehaviour
             dodgeCoolTime = dodgeCoolTime - Time.deltaTime;
         }
 
-        if(JK_Skills.instance.skillOneCoolTime < 0)
-        {
-            JK_Skills.instance.skillOneCoolTime = 0;
-        }
-        else
-        {
-            JK_Skills.instance.skillOneCoolTime = JK_Skills.instance.skillOneCoolTime - Time.deltaTime;
-        }
-
+        
+        
     }
    
+    /*IEnumerator SkillCoolTimeCoroutine()
+    {
+        yield return;
+    }*/
+
     // Dodge 함수
     void Dodge()
     {

@@ -10,6 +10,9 @@ public class JK_ComboManager : MonoBehaviour
     public Text comboTxt;   // current 콤보를 쓸 텍스트
     public int currentCombo;
     public Animator ani;
+
+    float currentTime;
+    float comboEndureTime = 4;
     private void Awake()
     {
         instance = this;
@@ -19,17 +22,29 @@ public class JK_ComboManager : MonoBehaviour
         comboObj.SetActive(false);
         comboTxt.gameObject.SetActive(false);
     }
+    public void Update()
+    {
+        currentTime += Time.deltaTime;
+        if(currentTime >= comboEndureTime)
+        {
+            currentTime = 0;
+            ResetCombo();
+        }
+    }
+
 
     public void IncreaseCombo()
     {
         currentCombo++;
+        currentTime = 0;
         comboTxt.text = currentCombo.ToString();
 
-        if(currentCombo >= 3)
+        if(currentCombo >= 1)
         {
             comboTxt.gameObject.SetActive(true);
             comboObj.SetActive(true);
         }
+       
         ani.SetTrigger("Combo");
     }
     public void ResetCombo()
@@ -38,4 +53,5 @@ public class JK_ComboManager : MonoBehaviour
         comboTxt.gameObject.SetActive(false);
         comboObj.SetActive(false);
     }
+    
 }

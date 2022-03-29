@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class JK_Skills : MonoBehaviour
 {
@@ -10,34 +11,43 @@ public class JK_Skills : MonoBehaviour
     Animator ani;
     public float addSpeed;
     public float jumpSpeed;
+
     public float skillOneCoolTime;
+    public float currentCooltime;
+    public float skillTwoCoolTime = 10;
+    public float SkillTwoCurrentCoolTime;
+
     public bool isSkillOne;
     public bool isSkillOne_2;
+    
     public Vector3 skillOneDir;
     public Vector3 skillOneDir_2;
 
+    float temp;
+    public Image[] skills;
 
     private void Awake()
     {
         instance = this;
         ani = GetComponent<Animator>();
-        // monsterList = new List<NavMeshAgent>();
+        //monsterList = new List<NavMeshAgent>();
 
     }
-
+    private void Start()
+    {
+        currentCooltime = 0.01f;
+        
+    }
     void Update()
     {
-        ShieldDash();
+        
         Skill_1_1();
+        Skill_1_CoolTime();
+        Skill_2_1();
+        Skill_2_CoolTime();
     }
 
-    void ShieldDash()
-    {
-        if (Input.GetKey(KeyCode.A))
-        {
-            ani.Play("Skill_ShieldDash_1");
-        }
-    }
+    
     void Skill_1_1()
     {
         // 만약 addSpeed가 0 이라면 (현재 Skill_1이 아닐경우) skillOneDir 현재 dir 방향을 넣어준다.
@@ -45,13 +55,14 @@ public class JK_Skills : MonoBehaviour
         {
             skillOneDir = this.transform.forward;
             // 만약 쉬프트가 눌리고 달리는 상태이며, dodge하는 중이 아니고, 쿨타임이 0이라면 
-            if (Input.GetKeyDown(KeyCode.S) && skillOneCoolTime <= 0 && !JK_Player.instance.isDodge && !isSkillOne && !isSkillOne_2)
+            if (Input.GetKeyDown(KeyCode.S) && currentCooltime <= 0 && !JK_Player.instance.isDodge && !isSkillOne && !isSkillOne_2)
             {
                 // dodgeSpeed 값을 addSpeed에 넣고, isDodge를 true로 하면서 애니메이션을 재생한다. 이 후, dodgeCoolTime에 회피 쿨타임을 넣어주고, dodgeTime에 회피(무적) 시간을 넣어준다. 
                 addSpeed = jumpSpeed;
                 ani.Play("Skill_1");
-                isSkillOne = true; ;
-                skillOneCoolTime = 5f;
+                isSkillOne = true; 
+                currentCooltime = skillOneCoolTime;
+                temp = 0;
 
 
             }
@@ -98,27 +109,99 @@ public class JK_Skills : MonoBehaviour
 
     }
 
-    void Roar()
-    {
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            ani.Play("Roar");
-        }
-    }
-
-
     void ShakeGround()
     {
         JK_CameraMove.instance.OnShakeCamera(0.5f, 0.05f);
     }
-   /* public int detectRadius = 5;
-    GameObject target;
-    public float gatheringSpeed = 2;
 
-    float damage;
-    float skillTwoCooltime = 0;
-    bool gatherEnemy = false;*/
-    // List<NavMeshAgent> monsterList;
+
+    void Skill_1_CoolTime()
+    {
+        if (currentCooltime > 0)
+        {
+            skills[0].enabled = true;
+            currentCooltime = currentCooltime - Time.deltaTime;
+            skills[0].fillAmount = skills[0].fillAmount - 1.0f / skillOneCoolTime * Time.deltaTime;
+            temp = temp + Time.deltaTime;
+        }
+        if (currentCooltime <= 0)
+        {
+            currentCooltime = 0;
+            skills[0].fillAmount = 1;
+            skills[0].enabled = false;
+        }
+    }
+
+
+    void Skill_2_1()
+    {
+        if (Input.GetKey(KeyCode.A) && SkillTwoCurrentCoolTime <= 0)
+        {
+            SkillTwoCurrentCoolTime = skillTwoCoolTime;
+            ani.Play("Skill_ShieldDash_1");
+        }
+    }
+
+    void Skill_2_2()
+    {
+        // 만약 addSpeed가 0 이라면 (현재 Skill_1이 아닐경우) skillOneDir 현재 dir 방향을 넣어준다.
+        if (addSpeed == 0)
+        {
+            skillOneDir = this.transform.forward;
+            // 만약 쉬프트가 눌리고 달리는 상태이며, dodge하는 중이 아니고, 쿨타임이 0이라면 
+            if (Input.GetKeyDown(KeyCode.S) && currentCooltime <= 0 && !JK_Player.instance.isDodge && !isSkillOne && !isSkillOne_2)
+            {
+                // dodgeSpeed 값을 addSpeed에 넣고, isDodge를 true로 하면서 애니메이션을 재생한다. 이 후, dodgeCoolTime에 회피 쿨타임을 넣어주고, dodgeTime에 회피(무적) 시간을 넣어준다. 
+                addSpeed = jumpSpeed;
+                ani.Play("Skill_1");
+                isSkillOne = true;
+                currentCooltime = skillOneCoolTime;
+                temp = 0;
+
+
+            }
+        }
+        // addSpeed가 0보다 크다면(전방 대쉬 중일 경우) addSpeed를 초기화한다.
+        if (addSpeed > 0)
+        {
+            addSpeed -= jumpSpeed * Time.deltaTime * 2;
+
+        }
+        // skill_1의 첫번째 대쉬 단계가 끝나면 초기화
+        else
+        {
+            addSpeed = 0;
+            isSkillOne = false;
+
+        }
+
+    }
+
+
+    void Skill_2_CoolTime()
+    {
+        if (SkillTwoCurrentCoolTime > 0)
+        {
+            skills[1].enabled = true;
+            SkillTwoCurrentCoolTime = SkillTwoCurrentCoolTime - Time.deltaTime;
+            skills[1].fillAmount = skills[1].fillAmount - 1.0f / skillTwoCoolTime * Time.deltaTime;
+            temp = temp + Time.deltaTime;
+        }
+        if (SkillTwoCurrentCoolTime <= 0)
+        {
+            SkillTwoCurrentCoolTime = 0;
+            skills[1].fillAmount = 1;
+            skills[1].enabled = false;
+        }
+    }
+    /* public int detectRadius = 5;
+     GameObject target;
+     public float gatheringSpeed = 2;
+
+     float damage;
+     float skillTwoCooltime = 0;
+     bool gatherEnemy = false;
+     List<NavMeshAgent> monsterList;*/
     /* private void GatherEnemy()
     {
         Collider[] obj = Physics.OverlapSphere(transform.position, detectRadius);
@@ -137,7 +220,7 @@ public class JK_Skills : MonoBehaviour
         }
     }*/
 
-    /*private void GatherEnemy2()
+    /*private void GatherEnemy()
     {
         Collider[] obj = Physics.OverlapSphere(transform.position, detectRadius);
         for (int i = 0; i < obj.Length; i++)
@@ -162,9 +245,9 @@ public class JK_Skills : MonoBehaviour
 
             }
         }
-    }*/
+    }
 
-    /*void DisposeEnemy()
+    void DisposeEnemy()
     {
         for (int i = 0; i < monsterList.Count; i++)
         {
