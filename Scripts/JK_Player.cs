@@ -5,9 +5,13 @@ using UnityEngine.UI;
 
 public class JK_Player : MonoBehaviour
 {
-   
-    public static JK_Player instance;
     
+
+    public static JK_Player instance;
+
+    public string stageName;
+    public int enemyCount;
+
     public float speed = 30f;
     public float dodgeSpeed = 2;
     public float addSpeed;
@@ -78,6 +82,7 @@ public class JK_Player : MonoBehaviour
         CoolTimeCal();
         Dead();
         FullUltGauge();
+        FreezeVelocity();
 
 
     }
@@ -300,6 +305,10 @@ public class JK_Player : MonoBehaviour
         {
             fillImage.color = new Color (160/255f, 245/255f, 255/255f);
         }
+    }
+    void FreezeVelocity()
+    {
+        rb.velocity = Vector3.zero;
     }
     public void DamageAction(int damage)
     {

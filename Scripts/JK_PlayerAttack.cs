@@ -85,7 +85,8 @@ public class JK_PlayerAttack : MonoBehaviour
    
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Z) && !JK_Player.instance.isDodge && !Jk_Parrying.instance.isParrying && !ani.GetCurrentAnimatorStateInfo(0).IsName("Counter"))
+        if (Input.GetKey(KeyCode.Z) && !JK_Player.instance.isDodge && !Jk_Parrying.instance.isParrying && !ani.GetCurrentAnimatorStateInfo(0).IsName("Counter") 
+            && !JK_Skills.instance.isSkillOne && !JK_Skills.instance.isSkillOne_2)
         { 
             Attack();
         }

@@ -8,8 +8,11 @@ public class JK_CameraMove : MonoBehaviour
     public Transform target; // 따라갈 대상 (Player)
     public Vector3 offset; // 플레이어로 부터 얼마만큼 떨어져서 갈지 정하는 벡터값
 
+
     public float shakeTime;
     public float shakeIntensity;
+
+    public bool isBonusStage;
     /// <param name="ShakeTime> 카메라 흔들림 지속 시간(설정하지 않으면 default 1.0f)
     /// <param name="ShakeIntensity> 카메라 흔들림 세기 (값이 클수록 세게 흔들린다)(설정하지 않으면 default 0.1f)    
     private void Awake()
@@ -21,10 +24,14 @@ public class JK_CameraMove : MonoBehaviour
     void Update()
     {
         transform.position = target.position + offset;
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+    }
+
+    public void BonusStage()
+    {
+       /* if (isBonusStage)
         {
-            OnShakeCamera(0.02f, 0.05f);
-        }
+            offset = new Vector3()
+        }*/
     }
     public void OnShakeCamera(float shakeTime = 0.02f, float shakeIntensity = 0.05f)
     {

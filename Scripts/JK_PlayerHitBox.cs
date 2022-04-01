@@ -16,7 +16,7 @@ public class JK_PlayerHitBox : MonoBehaviour
     {
         // 상대방의 태그가 Monster_Attack 일 때
         // (플레이어가 몬스터 공격 범위 안에 들어왔을때)
-        if (other.tag == "Monster_Attack")
+        if (other.tag == "Monster_Attack" || other.tag == "Monster_Arrow")
         {
 
             // Player의 태그가 Player_HitBox(노멀 상태)라면

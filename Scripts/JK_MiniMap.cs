@@ -11,7 +11,11 @@ public class JK_MiniMap : MonoBehaviour
         if(other.name == "Warrior")
         {
             playerIcon.transform.position = transform.position + new Vector3(0, 20, 0);
-            print("gg");
+            
         }
+        
+        
     }
+    
+
 }
