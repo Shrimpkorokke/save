@@ -7,10 +7,13 @@ public class JK_CameraMove : MonoBehaviour
     public static JK_CameraMove instance;
     public Transform target; // 따라갈 대상 (Player)
     public Vector3 offset; // 플레이어로 부터 얼마만큼 떨어져서 갈지 정하는 벡터값
-
+    public Vector3 offset2;
 
     public float shakeTime;
     public float shakeIntensity;
+
+    public float ultShakeTime;
+    public float ultShakeIntensity;
 
     public bool isBonusStage;
     /// <param name="ShakeTime> 카메라 흔들림 지속 시간(설정하지 않으면 default 1.0f)
@@ -23,16 +26,19 @@ public class JK_CameraMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = target.position + offset;
+        if(false == JK_Player.instance.isInBonusRoom)
+        {
+            transform.position = target.position + offset;
+            transform.rotation = Quaternion.Euler(40, 0, 0);
+        }
+        else if(true == JK_Player.instance.isInBonusRoom)
+        {
+            transform.position = target.position + offset2;
+            transform.rotation = Quaternion.Euler(6, 0, 0);
+        }
+        
     }
 
-    public void BonusStage()
-    {
-       /* if (isBonusStage)
-        {
-            offset = new Vector3()
-        }*/
-    }
     public void OnShakeCamera(float shakeTime = 0.02f, float shakeIntensity = 0.05f)
     {
         this.shakeTime = shakeTime;
@@ -63,6 +69,32 @@ public class JK_CameraMove : MonoBehaviour
         }
         transform.position = startPosition;
     }
+    public void ResetUltShake()
+    {
+        StopCoroutine("UltShake");
+        
+    }
+    public void UltOnShakeCamera(float ultShakeTime = 0.02f, float ultShakeIntensity = 0.05f)
+    {
+        this.ultShakeTime = ultShakeTime;
+        this.ultShakeIntensity = ultShakeIntensity;
 
+        StopCoroutine("UltShake");
+        StartCoroutine("UltShake");
+    }
+    public IEnumerator UltShake()
+    {
+        Vector3 startPosition = transform.position;
+        yield return new WaitForSecondsRealtime(0.5f);
+        while (ultShakeTime > 0.0f)
+        {
+            transform.position = startPosition + Random.insideUnitSphere * ultShakeIntensity;
+
+            ultShakeTime -= Time.deltaTime;
+            yield return null;
+        }
+        transform.position = startPosition;
+    }
+    
 
 }

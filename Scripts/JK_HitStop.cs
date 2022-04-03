@@ -6,6 +6,7 @@ public class JK_HitStop : MonoBehaviour
 {
     public static JK_HitStop instance;
     bool wating;
+    bool slow;
 
     void Awake()
     {
@@ -32,6 +33,29 @@ public class JK_HitStop : MonoBehaviour
         Time.timeScale = 1.0f;
         wating = false;
     }
-   
-    
+    public void ResetSlowStop()
+    {
+        StopCoroutine("Slow");
+        Time.timeScale = 1f;
+    }
+    public void SlowStop(float duration)
+    {
+        
+        // 만약 wating 상태라면 함수 종료
+        if (slow)
+        {
+            return;
+        }
+        Time.timeScale = 0.3f;
+
+        StartCoroutine(Wait(duration));
+    }
+    IEnumerator Slow(float duration)
+    {
+        wating = true;
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1.0f;
+        wating = false;
+    }
+  
 }

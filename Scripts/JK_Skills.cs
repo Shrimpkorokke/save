@@ -25,7 +25,16 @@ public class JK_Skills : MonoBehaviour
 
     float temp;
     public Image[] skills;
+    
+    public GameObject particle;
 
+    [SerializeField]
+    [Range(0.01f, 10f)]
+    private float fadeTime; // 값이 10이면 1초 (값이 클수록 빠름)
+    private float fadeInTime = 0.3f;
+    public Light light;
+
+    public GameObject ultHitBox;
     private void Awake()
     {
         instance = this;
@@ -36,7 +45,6 @@ public class JK_Skills : MonoBehaviour
     private void Start()
     {
         currentCooltime = 0.01f;
-        
     }
     void Update()
     {
@@ -45,6 +53,14 @@ public class JK_Skills : MonoBehaviour
         Skill_1_CoolTime();
         Skill_2_1();
         Skill_2_CoolTime();
+        Ult();
+        if (ani.GetCurrentAnimatorStateInfo(0).IsName("Ult"))
+        {
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                UltAttack();
+            }
+        }
     }
 
     
@@ -192,6 +208,82 @@ public class JK_Skills : MonoBehaviour
             SkillTwoCurrentCoolTime = 0;
             skills[1].fillAmount = 1;
             skills[1].enabled = false;
+        }
+    }
+
+    public void Ult()
+    {
+        if(Input.GetKeyDown(KeyCode.D))
+        {
+            ani.Play("Ult");
+          
+        }
+    }
+    public void UltStop()
+    {
+        ani.StartPlayback();
+        JK_HitStop.instance.SlowStop(5f);
+        //particle.SetActive(true);
+        JK_CameraMove.instance.UltOnShakeCamera(1, 0.02f);
+        StartCoroutine(UltFade(1, 0.3f));
+    }
+
+    public void UltAttack()
+    {
+        ani.StopPlayback();
+        StartCoroutine(UltFadeIn(0.3f, 1f));
+        JK_CameraMove.instance.ResetUltShake();
+        JK_HitStop.instance.ResetSlowStop();
+        JK_HitStop.instance.SlowStop(3f);
+        JK_Sword.instance.ChangeTag("Player_Attack");
+    }
+
+    public void UltAttack2()
+    {
+        ultHitBox.SetActive(true);
+    }
+    public void UltReset()
+    {
+
+    }
+    IEnumerator UltFade(float start, float end)
+    {
+        float currentTime = 0.0f;
+        float percent = 0.0f;
+
+        while (percent < 1)
+        {
+            // fadeTime으로 나누어서 fadeTime 시간 동안
+            //percent 값이 0에서 1로 증가하도록 함
+            currentTime += Time.deltaTime;
+            percent = currentTime / fadeTime;
+
+            //알파값을 start부터 end까지 fadeTime 시간 동안 변화시킨다
+            float intensity = light.intensity;
+            intensity = Mathf.Lerp(start, end, percent);
+            light.intensity = intensity;
+
+            yield return null;
+        }
+    }
+    IEnumerator UltFadeIn(float start, float end)
+    {
+        float currentTime = 0.0f;
+        float percent = 0.0f;
+
+        while (percent < 1)
+        {
+            // fadeTime으로 나누어서 fadeTime 시간 동안
+            //percent 값이 0에서 1로 증가하도록 함
+            currentTime += Time.deltaTime;
+            percent = currentTime / fadeInTime;
+
+            //알파값을 start부터 end까지 fadeTime 시간 동안 변화시킨다
+            float intensity = light.intensity;
+            intensity = Mathf.Lerp(start, end, percent);
+            light.intensity = intensity;
+
+            yield return null;
         }
     }
     /* public int detectRadius = 5;

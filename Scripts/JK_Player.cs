@@ -6,10 +6,7 @@ using UnityEngine.UI;
 public class JK_Player : MonoBehaviour
 {
     
-
     public static JK_Player instance;
-
-    public string stageName;
     public int enemyCount;
 
     public float speed = 30f;
@@ -41,7 +38,7 @@ public class JK_Player : MonoBehaviour
     public Animator ani;
     Rigidbody rb;
 
-    public int hp = 100;
+    public float hp = 100;
     public int maxHP = 1000;
     public Slider playerHP;
 
@@ -50,6 +47,7 @@ public class JK_Player : MonoBehaviour
     public Slider ultGauge;
     public Image fillImage;
 
+    public bool isInBonusRoom = false;
     
   
     void Awake()
@@ -86,13 +84,23 @@ public class JK_Player : MonoBehaviour
 
 
     }
-    public int HP
+    public float HP
     {
         get { return hp; }
         set
         {
             hp = value;
             playerHP.value = hp;
+        }
+    }
+
+    public int MaxHP
+    {
+        get { return maxHP; }
+        set
+        {
+            maxHP = value;
+            playerHP.maxValue = maxHP;
         }
     }
 
@@ -315,5 +323,21 @@ public class JK_Player : MonoBehaviour
         //Enemy의 공격력만큼 플레이어의 체력을 깎는다.
         hp -= damage;
         HP = hp;
+    }
+
+    // 최대체력 증가 보너스 선택하면 불릴 함수
+    public void MaxHpUp()
+    {
+        MaxHP = maxHP + 200;
+    }
+
+    public void Heal()
+    {
+        float currentHp = HP;
+        HP = currentHp + (MaxHP * 0.3f); 
+        if(HP > MaxHP)
+        {
+            HP = MaxHP;
+        }
     }
 }

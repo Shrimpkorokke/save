@@ -209,8 +209,13 @@ public class JK_Sword : MonoBehaviour
     }
 
     // 애니메이션 이벤트에 사용되는 함수 -> 태그를 바꿔준다 -> 사용법: 애니메이션 이벤트 추가를 누른 후 Function탭에 이 함수를 쓴다음에 String 칸에 바꾸고 싶은 태그를 적는다 예) Player_Attack
-    void ChangeTag(string t)
+    public void ChangeTag(string t)
     {
         this.tag = t;
+    }
+
+    public void DamageUp()
+    {
+        damage += 50;
     }
 }
