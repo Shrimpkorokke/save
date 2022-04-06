@@ -158,8 +158,43 @@ public class JK_Sword : MonoBehaviour
             }
 
         }
-            
-        
+        if (this.tag == "Player_Ult")
+        {
+            if (other.tag == "Monster_Melee_B" || other.tag == "Monster_Attack")
+            {
+                //MeleeEnemy에 대한 데미지 처리 및 체력바 조정
+                other.GetComponent<HSK_MeleeEnemy01>().HitEnemy(damage);
+                HSK_MeleeEnemy01.SingleTonMeleeEnemy01.hp = HSK_MeleeEnemy01.SingleTonMeleeEnemy01.hp - damage;
+                other.GetComponent<HSK_MeleeEnemy01>().HpBarDown();
+
+                // 궁극기 게이지 증가, 히트스탑, 카메라 흔들림, 효과음재생, 히트 이펙트 재생
+                JK_Player.instance.ULTGAUGE = JK_Player.instance.ULTGAUGE + 1;
+                JK_ComboManager.instance.IncreaseCombo();
+                GameObject hitEffect = Instantiate(hitEffectFactory); //이펙트 재생
+                hitEffect.transform.position = other.transform.position + new Vector3(0, 1, 0); //이펙트 위치
+                JK_CameraMove.instance.OnShakeCamera(0.05f, 0.05f);
+                JK_HitStop.instance.Stop(0.05f);
+                JK_AudioManager.instance.PlayAudio();
+                print("Hit");
+            }
+            else if (other.tag == "Monster_Ranged_A")
+            {
+                //MeleeEnemy에 대한 데미지 처리 및 체력바 조정
+                other.GetComponent<HSK_RangedEnemy01>().HitEnemy(damage);
+                HSK_RangedEnemy01.SingleTonRangedEnemy01.hp = HSK_RangedEnemy01.SingleTonRangedEnemy01.hp - damage;
+                other.GetComponent<HSK_RangedEnemy01>().HpBarDown();
+
+                // 궁극기 게이지 증가, 히트스탑, 카메라 흔들림, 효과음재생, 히트 이펙트 재생
+                JK_Player.instance.ULTGAUGE = JK_Player.instance.ULTGAUGE + 1;
+                JK_ComboManager.instance.IncreaseCombo();
+                GameObject hitEffect = Instantiate(hitEffectFactory); //이펙트 재생
+                hitEffect.transform.position = other.transform.position + new Vector3(0, 1, 0); //이펙트 위치
+                JK_CameraMove.instance.OnShakeCamera(0.05f, 0.05f);
+                JK_HitStop.instance.Stop(0.02f);
+                JK_AudioManager.instance.PlayAudio();
+                print("Hit");
+            }
+        }
     }
     
     public void AttackHit_1() // Attack 1,2,4 

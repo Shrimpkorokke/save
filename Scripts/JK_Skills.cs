@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using UnityEngine.Rendering.PostProcessing;
 
 public class JK_Skills : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class JK_Skills : MonoBehaviour
     private float fadeTime; // 값이 10이면 1초 (값이 클수록 빠름)
     private float fadeInTime = 0.3f;
     public Light light;
-
+    
     public GameObject ultHitBox;
     private void Awake()
     {
@@ -71,7 +72,7 @@ public class JK_Skills : MonoBehaviour
         {
             skillOneDir = this.transform.forward;
             // 만약 쉬프트가 눌리고 달리는 상태이며, dodge하는 중이 아니고, 쿨타임이 0이라면 
-            if (Input.GetKeyDown(KeyCode.S) && currentCooltime <= 0 && !JK_Player.instance.isDodge && !isSkillOne && !isSkillOne_2)
+            if (Input.GetKeyDown(KeyCode.S) && currentCooltime <= 0 && !JK_Player.instance.isDodge && !isSkillOne && !isSkillOne_2 && !isUlt)
             {
                 // dodgeSpeed 값을 addSpeed에 넣고, isDodge를 true로 하면서 애니메이션을 재생한다. 이 후, dodgeCoolTime에 회피 쿨타임을 넣어주고, dodgeTime에 회피(무적) 시간을 넣어준다. 
                 addSpeed = jumpSpeed;
@@ -123,6 +124,13 @@ public class JK_Skills : MonoBehaviour
             isSkillOne_2 = false;
         }
 
+    }
+
+    void ResetSkillOne()
+    {
+        addSpeed = 0;
+        isSkillOne = false;
+        isSkillOne_2 = false;
     }
 
     void ShakeGround()
@@ -210,13 +218,17 @@ public class JK_Skills : MonoBehaviour
             skills[1].enabled = false;
         }
     }
-
+    public bool isUlt;
+    public Vector3 ultDir;
     public void Ult()
     {
-        if(Input.GetKeyDown(KeyCode.D))
+        if(Input.GetKeyDown(KeyCode.D) && JK_Player.instance.ULTGAUGE >= 50)
         {
             ani.Play("Ult");
-          
+            isUlt = true;
+            ultDir = this.transform.forward;
+            JK_Player.instance.ULTGAUGE = 0;
+            
         }
     }
     public void UltStop()
@@ -231,21 +243,69 @@ public class JK_Skills : MonoBehaviour
     public void UltAttack()
     {
         ani.StopPlayback();
+        JK_Sword.instance.ChangeTag("Player_Ult");
+        UltReset();
         StartCoroutine(UltFadeIn(0.3f, 1f));
-        JK_CameraMove.instance.ResetUltShake();
-        JK_HitStop.instance.ResetSlowStop();
-        JK_HitStop.instance.SlowStop(3f);
-        JK_Sword.instance.ChangeTag("Player_Attack");
+        JK_HitStop.instance.SlowStop(2f);
+        
     }
 
     public void UltAttack2()
     {
-        ultHitBox.SetActive(true);
+        StartCoroutine("IEUltAttack");
     }
-    public void UltReset()
+    IEnumerator IEUltAttack()
     {
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
 
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
+        yield return new WaitForSeconds(0.02f);
+
+        ultHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.02f);
+        ultHitBox.SetActive(false);
     }
+    
     IEnumerator UltFade(float start, float end)
     {
         float currentTime = 0.0f;
@@ -286,6 +346,57 @@ public class JK_Skills : MonoBehaviour
             yield return null;
         }
     }
+
+
+    public GameObject ultSword;
+    public GameObject normalSword;
+    public GameObject postProcessing;
+    public GameObject ultEffect;
+    public void UltReset()
+    {
+        JK_CameraMove.instance.ResetUltShake();
+        JK_HitStop.instance.ResetSlowStop();
+        StopCoroutine("UltFade");
+        StopCoroutine("UltFadeIn");
+        
+    }
+    public bool UltBoolSet()
+    {
+        isUlt = false;
+        return isUlt;
+    }
+    public void MeshEffect()
+    {
+        if (normalSword.activeSelf == true)
+        {
+            normalSword.SetActive(false);
+            ultSword.SetActive(true);
+            postProcessing.SetActive(true);
+            
+
+        }
+        else if (ultSword.activeSelf == true)
+        {
+            ultSword.SetActive(false);
+            normalSword.SetActive(true);
+            postProcessing.SetActive(false);
+            
+        }
+    }
+
+    GameObject ultObj;
+    public Transform firstPos;
+    public Transform endPos;
+    public void UltEffect()
+    {
+        ultObj = Instantiate(ultEffect);
+        ultObj.transform.position = firstPos.transform.position;
+    }
+    public void OffUltEffect()
+    {
+        Destroy(ultObj);
+    }
+    
     /* public int detectRadius = 5;
      GameObject target;
      public float gatheringSpeed = 2;

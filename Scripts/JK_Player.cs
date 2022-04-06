@@ -36,7 +36,7 @@ public class JK_Player : MonoBehaviour
     
   
     public Animator ani;
-    Rigidbody rb;
+    public Rigidbody rb;
 
     public float hp = 100;
     public int maxHP = 1000;
@@ -81,7 +81,7 @@ public class JK_Player : MonoBehaviour
         Dead();
         FullUltGauge();
         FreezeVelocity();
-
+        
 
     }
     public float HP
@@ -121,14 +121,14 @@ public class JK_Player : MonoBehaviour
         dir.Normalize();
 
         // Dodge 또는 스킬 1의 첫번째 미끄러지는 애니메이션 단계 (isSkillOne) 중이 아니라면 정상적으로 이동
-        if (!isDodge && !JK_Skills.instance.isSkillOne)
+        if (!isDodge && !JK_Skills.instance.isSkillOne && !JK_Tutorial.instance.duringTuto)
         {
 
             rb.MovePosition(transform.position + dir * speed * Time.deltaTime);
                 
         }
         // Dodge 중이라면 dodgeDir 방향으로 높인 속도 만큼 이동.
-        else if(isDodge)
+        else if(isDodge && !JK_Tutorial.instance.duringTuto)
         {
             dir = dodgeDir;
             rb.MovePosition(transform.position + dodgeDir * (addSpeed * dodgeSpeed) * Time.deltaTime * 2.5f);
@@ -136,7 +136,7 @@ public class JK_Player : MonoBehaviour
         }
 
         // 스킬 1의 첫번째 미끄러지는 애니메이션 단계 (isSkillOne) 중이라면 앞으로 대쉬
-        else if (JK_Skills.instance.isSkillOne)
+        else if (JK_Skills.instance.isSkillOne && !JK_Tutorial.instance.duringTuto)
         {
             dir = JK_Skills.instance.skillOneDir;
             rb.MovePosition(transform.position + JK_Skills.instance.skillOneDir * (JK_Skills.instance.addSpeed * JK_Skills.instance.jumpSpeed) * Time.deltaTime * 2.5f);
@@ -183,6 +183,12 @@ public class JK_Player : MonoBehaviour
             speed = 0;
             rb.MovePosition(transform.position + Vector3.zero * speed * Time.deltaTime);
         }
+        else if (JK_Skills.instance.isUlt == true)
+        {
+            dir = JK_Skills.instance.ultDir;
+            speed = 0;
+            rb.MovePosition(transform.position + Vector3.zero * speed * Time.deltaTime);
+        }
         // 플레이어가 죽을 때 방향을 죽기 직전의 방향으로 설정하고, 속도를 0으로 만든다. (못 움직이게)
         else if (this.tag == "Player_Dead")
         {
@@ -195,7 +201,14 @@ public class JK_Player : MonoBehaviour
             rb.MovePosition(transform.position + Vector3.zero * speed * Time.deltaTime);
             Vector3.forward;*/
         }
-        else if (!isDodge && !Jk_Parrying.instance.isParrying && this.tag != "Player_Dead" && !JK_Skills.instance.isSkillOne && !JK_Skills.instance.isSkillOne_2 && !this.CompareTag("Player_SDash"))
+        else if (JK_Tutorial.instance.duringTuto)
+        {
+            dir = Vector3.zero;
+            speed = 0;
+            rb.MovePosition(transform.position + Vector3.zero * speed * Time.deltaTime);
+        }
+        
+        else if (!isDodge && !Jk_Parrying.instance.isParrying && this.tag != "Player_Dead" && !JK_Skills.instance.isSkillOne && !JK_Skills.instance.isSkillOne_2 && !this.CompareTag("Player_SDash") && !JK_Skills.instance.isUlt)
         {
             speed = 30;
         }
@@ -307,13 +320,24 @@ public class JK_Player : MonoBehaviour
         
     }
 
+    public Image ultImg;
+    Color a;
     void FullUltGauge()
     {
         if(ultGauge.value == maxUlt)
         {
             fillImage.color = new Color (160/255f, 245/255f, 255/255f);
+            a.a = 0f;
+            ultImg.color = a;
+        }
+        else if(ultGauge.value < maxUlt)
+        {
+            fillImage.color = new Color(15 / 255f, 139 / 154f, 255 / 255f);
+            a.a = 0.5f;
+            ultImg.color = a;
         }
     }
+   
     void FreezeVelocity()
     {
         rb.velocity = Vector3.zero;
